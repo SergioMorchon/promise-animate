@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Promise animate</title>
+    <style>
+      #run {
+        display: block;
+      }
+      #animated-element {
+        display: inline-block;
+        background-color: red;
+        height: 100px;
+      }
+    </style>
+    <script defer="defer" type="module">
+      import animate from "./index.js";
+
+      const runCheck = document.querySelector("input[type=checkbox]");
+      const animatedElement = document.getElementById("animated-element");
+      let cancellationToken = {
+        cancel: !runCheck.checked
+      };
+      const minWidth = 100;
+      const maxWidth = 500;
+      const widthRange = maxWidth - minWidth;
+      const setWidth = width => {
+        animatedElement.style.width = `${width}px`;
+      };
+      setWidth(minWidth);
+      const commonWidthAnimationProps = {
+        cancellationToken,
+        setValue: setWidth
+      };
+      const loop = async () => {
+        while (!cancellationToken.cancel) {
+          await animate({
+            ...commonWidthAnimationProps,
+            duration: 1000,
+            getValue: progress => minWidth + widthRange * progress
+          });
+          await animate({
+            ...commonWidthAnimationProps,
+            duration: 500,
+            getValue: progress => maxWidth - widthRange * progress
+          });
+        }
+      };
+
+      runCheck.addEventListener("change", () => {
+        cancellationToken.cancel = !runCheck.checked;
+        if (runCheck.checked) {
+          loop();
+        }
+      });
+
+      if (runCheck.checked) {
+        loop();
+      }
+    </script>
+  </head>
+  <body>
+    <label>Run <input id="run" type="checkbox"/></label>
+    <div id="animated-element"></div>
+  </body>
+</html>

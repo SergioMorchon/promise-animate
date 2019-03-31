@@ -8,25 +8,27 @@ interface IAnimateOptions<Value> {
     progress: number
   ) => Value;
   setValue: (value: Value) => void;
-}
-
-interface IAnimation {
-  cancel: () => void;
-  promise: Promise<void>;
+  cancellationToken?: {
+    cancel: boolean;
+  };
 }
 
 export default <Value>({
   duration,
   getValue,
-  setValue
-}: IAnimateOptions<Value>): IAnimation => {
-  let animationFrame: number | undefined;
-  let rejectPromise: () => void;
-  const promise = new Promise<void>((resolve, reject) => {
-    rejectPromise = reject;
+  setValue,
+  cancellationToken
+}: IAnimateOptions<Value>) =>
+  new Promise<void>(resolve => {
     const startTimestamp = Date.now();
     const endTimestamp = startTimestamp + duration;
-    const loop = (now: number) => {
+    const loop = () => {
+      const now = Date.now();
+      if (cancellationToken && cancellationToken.cancel) {
+        resolve();
+        return;
+      }
+
       if (now >= endTimestamp) {
         setValue(getValue(1));
         resolve();
@@ -34,18 +36,7 @@ export default <Value>({
       }
 
       setValue(getValue(Math.min(1, (now - startTimestamp) / duration)));
-      animationFrame = requestAnimationFrame(loop);
+      requestAnimationFrame(loop);
     };
-    animationFrame = requestAnimationFrame(loop);
+    requestAnimationFrame(loop);
   });
-  return {
-    promise,
-    cancel: () => {
-      if (animationFrame !== undefined) {
-        cancelAnimationFrame(animationFrame);
-      }
-
-      rejectPromise();
-    }
-  };
-};
