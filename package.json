@@ -4,6 +4,10 @@
   "description": "Use request animation frame with promises and pleasure",
   "main": "index.js",
   "types": "index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SergioMorchon/promise-animate"
+  },
   "keywords": [
     "request",
     "animation",
