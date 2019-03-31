@@ -1,0 +1,25 @@
+{
+  "name": "promise-animate",
+  "version": "1.0.0",
+  "description": "Use request animation frame with promises and pleasure",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "keywords": [
+    "request",
+    "animation",
+    "frame",
+    "promise"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "author": {
+    "name": "Sergio Morchón Poveda",
+    "email": "sergio.morchon@outlook.com"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^3.4.1"
+  }
+}
