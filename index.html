@@ -14,41 +14,40 @@
       }
     </style>
     <script defer="defer" type="module">
-      import animate from "https://unpkg.com/promise-animate@1.0.1/index.js";
+      import animate from "https://unpkg.com/promise-animate@latest";
 
       const runCheck = document.querySelector("input[type=checkbox]");
       const animatedElement = document.getElementById("animated-element");
       let cancellationToken = {
-        cancel: !runCheck.checked
+        get cancel() {
+          return !runCheck.checked;
+        }
       };
       const minWidth = 100;
       const maxWidth = 500;
       const widthRange = maxWidth - minWidth;
-      const setWidth = width => {
-        animatedElement.style.width = `${width}px`;
-      };
-      setWidth(minWidth);
-      const commonWidthAnimationProps = {
-        cancellationToken,
-        setValue: setWidth
-      };
       const loop = async () => {
         while (!cancellationToken.cancel) {
           await animate({
-            ...commonWidthAnimationProps,
+            cancellationToken,
             duration: 1000,
-            getValue: progress => minWidth + widthRange * progress
+            update: progress => {
+              animatedElement.style.width = `${minWidth +
+                widthRange * progress}px`;
+            }
           });
           await animate({
-            ...commonWidthAnimationProps,
+            cancellationToken,
             duration: 500,
-            getValue: progress => maxWidth - widthRange * progress
+            update: progress => {
+              animatedElement.style.width = `${maxWidth -
+                widthRange * progress}px`;
+            }
           });
         }
       };
 
       runCheck.addEventListener("change", () => {
-        cancellationToken.cancel = !runCheck.checked;
         if (runCheck.checked) {
           loop();
         }

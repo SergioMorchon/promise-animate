@@ -1,24 +1,18 @@
-interface IAnimateOptions<Value> {
+interface IAnimateOptions {
   duration: number;
-  getValue: (
+  update: (
     /**
      * The progress of the animation over the time.
      * Between `0` and `1`.
      */
     progress: number
-  ) => Value;
-  setValue: (value: Value) => void;
+  ) => void;
   cancellationToken?: {
     cancel: boolean;
   };
 }
 
-export default <Value>({
-  duration,
-  getValue,
-  setValue,
-  cancellationToken
-}: IAnimateOptions<Value>) =>
+export default ({ duration, update, cancellationToken }: IAnimateOptions) =>
   new Promise<void>(resolve => {
     const startTimestamp = Date.now();
     const endTimestamp = startTimestamp + duration;
@@ -30,12 +24,12 @@ export default <Value>({
       }
 
       if (now >= endTimestamp) {
-        setValue(getValue(1));
+        update(1);
         resolve();
         return;
       }
 
-      setValue(getValue(Math.min(1, (now - startTimestamp) / duration)));
+      update(Math.min(1, (now - startTimestamp) / duration));
       requestAnimationFrame(loop);
     };
     requestAnimationFrame(loop);
